@@ -1,0 +1,14 @@
+/vendor/
+/node_modules/
+
+# Cache and logs
+/var/cache/*
+/var/log/*
+
+# Config
+/config/config.php
+/config/*.sqlite
+/config/*.db
+
+# Web assets
+/public/assets/dist/*

@@ -1,0 +1,11 @@
+<?php
+
+return [
+    'APP_ENV' => 'DEBUG',
+    'database' => [
+        'dsn' => 'sqlite:'.__DIR__.'/pastes.db',
+        'username' => null,
+        'password' => null,
+        'options' => null,
+    ],
+];

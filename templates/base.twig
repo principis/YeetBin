@@ -1,0 +1,86 @@
+{#
+# This file is part of YeetBin.
+# Copyright (C) 2023 Arthur Bols
+#
+# YeetBin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# YeetBin is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with YeetBin.  If not, see <https://www.gnu.org/licenses/>.
+#}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+
+    <script src="{{ asset('assets/dist/runtime.js') }}"></script>
+    <script src="{{ asset('assets/dist/color-mode.js') }}"></script>
+    <link href="{{ asset('assets/dist/app.css') }}" rel="stylesheet">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+<div class="container py-3">
+    <header class="pb-3 mb-3 border-bottom">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-start">
+                <a class="nav-link" href="{{ path('home') }}">
+                    <span class="fs-4">YeetBin</span>
+                </a>
+                <ul class="navbar-nav flex-row col-auto ms-auto">
+                    <li class="nav-item py-2">
+                        <div class="vr d-flex h-100 mx-2"></div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <button class="nav-link btn btn-link opacity-75 dropdown-toggle d-flex h-100 align-items-center p-0"
+                                id="bd-theme" type="button" data-bs-toggle="dropdown"
+                                aria-expanded="false">
+                            <i class="bi bi-circle-half theme-icon-active"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme">
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="light">
+                                    <i class="bi me-2 opacity-50 bi-sun-fill"></i>
+                                    Light
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center"
+                                        data-bs-theme-value="dark">
+                                    <i class="bi me-2 opacity-50 bi-moon-stars-fill"></i>
+                                    Dark
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="dropdown-item d-flex align-items-center active"
+                                        data-bs-theme-value="auto">
+                                    <i class="bi me-2 opacity-50 bi-circle-half"></i>
+                                    Auto
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    {% block body %}
+    {% endblock %}
+</div>
+
+
+<script src="{{ asset('assets/dist/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

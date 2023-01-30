@@ -1,0 +1,59 @@
+{#
+# This file is part of YeetBin.
+# Copyright (C) 2023 Arthur Bols
+#
+# YeetBin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# YeetBin is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with YeetBin.  If not, see <https://www.gnu.org/licenses/>.
+#}
+
+{% extends 'base.twig' %}
+
+{% block body %}
+    <h1 class="mb-4">New Paste</h1>
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-tab-pane"
+                            type="button" role="tab">Text
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div id="tabContent" class="tab-content">
+                <div id="text-tab-pane" class="tab-pane active" role="tabpanel" tabindex="0">
+                    {% include 'includes/paste-form-start.twig' %}
+                    {% set language_block %}
+                        <div class="col-auto">
+                            <label for="inputLanguage">Language</label>
+                            <select name="paste[language]" id="inputLanguage" class="form-select">
+                                <option value="plaintext" selected>Plain text</option>
+                                <option value="autodetect">Auto-Detect (caution)</option>
+                                {% for key, val in languages %}
+                                    <option value="{{ key }}">{{ val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endset %}
+                    {% include 'includes/paste-form-header.twig' with {'extra_header_block': language_block} only %}
+                    <div class="mb-3">
+                        <label for="inputCode" class="form-label">Your paste</label>
+                        <textarea name="paste[content]" class="form-control" id="inputCode" rows="10"></textarea>
+                    </div>
+                    {% include 'includes/paste-form-end.twig' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

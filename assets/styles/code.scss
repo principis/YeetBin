@@ -1,0 +1,17 @@
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em
+}
+
+code.hljs {
+  padding: 3px 5px
+}
+
+[data-bs-theme=light] {
+  @import "~highlight.js/styles/atom-one-light";
+}
+
+[data-bs-theme=dark] {
+  @import "~highlight.js/styles/atom-one-dark-reasonable";
+}

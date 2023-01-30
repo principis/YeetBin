@@ -1,0 +1,29 @@
+{
+    "name": "principis/yeetbin",
+    "description": "A simple, intuitive pastebin and file-sharing service.",
+    "type": "project",
+    "license": "AGPLv3+",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Arthur Bols",
+            "email": "arthur@bols.dev"
+        }
+    ],
+    "require": {
+        "php": ">=8.1.2",
+        "symfony/routing": "^6.2",
+        "symfony/http-foundation": "^6.2",
+        "symfony/http-kernel": "^6.2",
+        "symfony/asset": "^6.2",
+        "symfony/twig-bridge": "^6.2",
+        "ext-pdo": "*"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^6.2"
+    }
+}
