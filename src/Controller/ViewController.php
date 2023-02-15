@@ -21,6 +21,7 @@
 namespace App\Controller;
 
 use App\Database\Database;
+use App\Entity\TextPaste;
 use App\Ui\Ui;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -33,41 +34,39 @@ class ViewController
         $paste = self::getPaste($db, $id);
 
         $ui->setTemplate('view.twig');
-        $ui->addArg('language', $paste['language']);
-        $ui->addArg('content', $paste['content']);
-        $ui->addArg('paste_title', $paste['title'] ?? $id);
-        $ui->addArg('page_id', $id);
+        $ui->addArg('paste', $paste);
 
         return new Response($ui->render());
     }
 
-    private static function getPaste(Database $db, string $id)
+    private static function getPaste(Database $db, string $id) :TextPaste
     {
         $paste = $db->getPaste($id);
         if ($paste === false) {
             throw new BadRequestHttpException("Paste not found");
         }
 
-        return array_filter($paste);
+        return $paste;
     }
 
     public function raw(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
 
-        return new Response($paste['content'], 200, ['content-type' => 'text/plain; charset=UTF-8']);
+        return new Response($paste->getContent(), 200, ['content-type' => 'text/plain; charset=UTF-8']);
     }
 
     public function download(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
 
-        $filename = "$id.txt";
-        $filecontent = $paste['content'] ?? ''; // TODO throws error
+        $filename = $paste->getTitle() ?? $id;
+        $filecontent = $paste->getContent() ?? '';
 
         $response = new Response($filecontent);
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename);
         $response->headers->set('Content-Disposition', $disposition);
+        $response->headers->set('content-type','text/plain; charset=UTF-8');
 
         return $response;
     }

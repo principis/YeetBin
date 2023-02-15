@@ -21,13 +21,13 @@
 namespace App\Controller;
 
 use App\Database\Database;
+use App\Entity\TextPaste;
 use App\Ui\Ui;
 use App\Util\Languages;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DefaultController
@@ -63,11 +63,7 @@ class DefaultController
             throw new BadRequestHttpException("Language is required!");
         }
 
-        $id = $db->addTextPaste($title, $language, $content);
-
-        if ($id === false) {
-            throw new HttpException(500);
-        }
+        $id = $db->addPaste(new TextPaste(null, $title, $language, $content));
 
         return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
     }

@@ -20,12 +20,14 @@
 
 namespace App\Database;
 
+use App\Entity\Paste;
+use App\Entity\TextPaste;
 use App\Util\Random;
 use PDO;
+use PDOException;
 
 class Database
 {
-    const TEXT_PASTE = 0;
     const PASTE_ID_LENGTH = 8;
 
     private PDO $conn;
@@ -36,49 +38,103 @@ class Database
         $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
-    public function query(string $query, ?array $params = null)
+    /**
+     * @param Paste $paste
+     * @return string
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function addPaste(Paste $paste) :string
     {
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute($params);
-
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function addTextPaste(?string $title, string $language, string $content) :bool|string
-    {
-        $id = $this->findAvailableId();
+        $uid = $this->findAvailableUID();
+        $type = PasteType::fromPaste($paste);
 
         $stmt = $this->conn->prepare(
-            'INSERT INTO pastes (`id`, `title`, `type`, `language`, `content`) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO pastes (uid, type, title) VALUES (?, ?, ?)'
         );
-        $result = $stmt->execute(array($id, $title, self::TEXT_PASTE, $language, $content));
+        $stmt->execute([$uid, $type->value, $paste->getTitle()]);
 
-        if ($result) {
-            return $id;
-        }
+        match ($type) {
+            PasteType::TEXT => $this->addTextPaste($this->conn->lastInsertId(), $paste)
+        };
 
-        return false;
+        return $uid;
     }
 
-    public function findAvailableId() :string
+    /**
+     * @return string
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function findAvailableUID() :string
     {
         do {
             $id = Random::pasteId(self::PASTE_ID_LENGTH);
 
-            $stmt = $this->conn->prepare('SELECT `id` FROM pastes WHERE id = ? LIMIT 1');
+            $stmt = $this->conn->prepare('SELECT uid FROM pastes WHERE uid = ? LIMIT 1');
             $stmt->execute([$id]);
 
-            $isAvailable = $stmt->rowCount() === 0;
+            $isAvailable = empty($stmt->fetch());
         } while (!$isAvailable);
 
         return $id;
     }
 
-    public function getPaste(string $id) :array|bool
+    /**
+     * Inserts the given TextPaste. Must be called immediately after inserting the abstract Paste.
+     * @param int $pasteID the ID of the abstract Paste.
+     * @param TextPaste $paste
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    private function addTextPaste(int $pasteID, TextPaste $paste) :void
     {
-        $stmt = $this->conn->prepare('SELECT * FROM pastes WHERE `id` = ?;');
-        $stmt->execute(array($id));
+        $stmt = $this->conn->prepare(
+            'INSERT INTO text_pastes (paste_id, lang, content) VALUES (?, ?, ?)'
+        );
+        $stmt->execute([$pasteID, $paste->getLanguage(), $paste->getContent()]);
+    }
 
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    /**
+     * @param string $uid
+     * @return Paste|bool The fetched Paste or <b>FALSE</b> if no Paste with the given $uid was found.
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function getPaste(string $uid) :Paste|bool
+    {
+        $stmt = $this->conn->prepare('SELECT type FROM pastes WHERE uid = ?;');
+        $stmt->execute([$uid]);
+
+        $pasteData = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (empty($pasteData)) {
+            return false;
+        }
+        $type = PasteType::from($pasteData['type']);
+
+        return match ($type) {
+            PasteType::TEXT => $this->getTextPaste($uid)
+        };
+    }
+
+    /**
+     * @param string $uid
+     * @return TextPaste|bool The fetched TextPaste or <b>FALSE</b> if no TextPaste with the given $uid was found.
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function getTextPaste(string $uid) :TextPaste|bool
+    {
+        $stmt = $this->conn->prepare(
+            'SELECT * FROM text_pastes AS t INNER JOIN pastes AS p on t.paste_id = p.id WHERE p.uid = ?'
+        );
+        $stmt->execute([$uid]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($data)) {
+            return false;
+        }
+
+        return new TextPaste(
+            $data['id'],
+            $data['title'],
+            $data['lang'],
+            $data['content']
+        );
     }
 }
