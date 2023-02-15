@@ -1,39 +1,23 @@
 <?php
 
 use App\Controller;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 
 
-return static function (RouteCollection $routes) {
-    $routes->add(
-        'home',
-        new Route('/', [
-            '_controller' => [Controller\DefaultController::class, 'index'],
-        ])
-    );
-    $routes->add(
-        'add_paste',
-        new Route('/add', [
-            '_controller' => [Controller\DefaultController::class, 'addPaste'],
-        ])
-    );
-    $routes->add(
-        'view',
-        new Route('/view/{id}', [
-            '_controller' => [Controller\ViewController::class, 'view'],
-        ])
-    );
-    $routes->add(
-        'raw',
-        new Route('/raw/{id}', [
-            '_controller' => [Controller\ViewController::class, 'raw'],
-        ])
-    );
-    $routes->add(
-        'download',
-        new Route('/dl/{id}', [
-            '_controller' => [Controller\ViewController::class, 'download'],
-        ])
-    );
+return static function (RouteConfigurator $routes) {
+    $routes->add('home', '/')
+        ->controller([Controller\DefaultController::class, 'index'])
+        ->methods(['GET']);
+    $routes->add('add_paste', '/add')
+        ->controller([Controller\DefaultController::class, 'addPaste'])
+        ->methods(['POST']);
+    $routes->add('view', '/view/{id}')
+        ->controller([Controller\ViewController::class, 'view'])
+        ->methods(['GET']);
+    $routes->add('raw', '/raw/{id}')
+        ->controller([Controller\ViewController::class, 'raw'])
+        ->methods(['GET']);
+    $routes->add('download', '/dl/{id}')
+        ->controller([Controller\ViewController::class, 'download'])
+        ->methods(['GET']);
 };

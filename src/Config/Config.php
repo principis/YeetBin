@@ -20,6 +20,7 @@
 
 namespace App\Config;
 
+use Symfony\Component\Routing\Loader\Configurator\RouteConfigurator;
 use Symfony\Component\Routing\RouteCollection;
 
 class Config
@@ -61,8 +62,9 @@ class Config
     public static function loadRoutes() :RouteCollection
     {
         $routes = new RouteCollection();
+        $configurator = new RouteConfigurator($routes, new RouteCollection());
         $cfg = include dirname(__DIR__, 2).'/config/routes.php';
-        $cfg($routes);
+        $cfg($configurator);
 
         return $routes;
     }
