@@ -26,6 +26,7 @@ use PDO;
 class Database
 {
     const TEXT_PASTE = 0;
+    const PASTE_ID_LENGTH = 8;
 
     private PDO $conn;
 
@@ -62,7 +63,7 @@ class Database
     public function findAvailableId() :string
     {
         do {
-            $id = Random::pasteId();
+            $id = Random::pasteId(self::PASTE_ID_LENGTH);
 
             $stmt = $this->conn->prepare('SELECT `id` FROM pastes WHERE id = ? LIMIT 1');
             $stmt->execute([$id]);

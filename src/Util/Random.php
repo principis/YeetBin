@@ -22,15 +22,14 @@ namespace App\Util;
 
 class Random
 {
-    const PASTE_ID_LENGTH = 8;
 
-    public static function pasteId() :string
+    public static function pasteId(int $length) :string
     {
         $result = '';
 
-        while (strlen($result) < self::PASTE_ID_LENGTH) {
-            $bytes = random_bytes(self::PASTE_ID_LENGTH * 2); // Generate enough bytes
-            $result = substr(str_replace(['+', '/', '='], '', base64_encode($bytes)), 0, self::PASTE_ID_LENGTH);
+        while (strlen($result) < $length) {
+            $bytes = random_bytes($length * 2); // Generate enough bytes
+            $result = substr(str_replace(['+', '/', '='], '', base64_encode($bytes)), 0, $length);
         }
 
         return $result;
