@@ -32,6 +32,7 @@ use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\TemplateWrapper;
 
@@ -45,16 +46,21 @@ class Ui
     {
         $twigLoader = new FilesystemLoader(dirname(__DIR__, 2).'/templates');
 
-        $envOptions = [];
-        if (!Config::getInstance()->isDebug()) {
-            $envOptions = ['cache' => dirname(__DIR__, 2).'/var/cache'];
-        }
+        $envOptions = [
+            'cache' => dirname(__DIR__, 2).'/var/cache',
+            'debug' => Config::getInstance()->isDebug(),
+        ];
+
         $this->twig = new Environment($twigLoader, $envOptions);
 
         $defaultPackage = new PathPackage($request->getBasePath(), new EmptyVersionStrategy());
         $packages = new Packages($defaultPackage);
         $this->twig->addExtension(new AssetExtension($packages));
         $this->twig->addExtension(new RoutingExtension($urlGenerator));
+
+        if (Config::getInstance()->isDebug()) {
+            $this->twig->addExtension(new DebugExtension());
+        }
     }
 
     /**
