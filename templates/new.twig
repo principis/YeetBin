@@ -33,7 +33,7 @@
         <div class="card-body">
             <div id="tabContent" class="tab-content">
                 <div id="text-tab-pane" class="tab-pane active" role="tabpanel" tabindex="0">
-                    {% include 'includes/paste-form-start.twig' %}
+                    {% include 'includes/paste-form-start.twig' with {paste_type: 'text'} %}
                     {% set language_block %}
                         <div class="col-auto">
                             <label for="inputLanguage">Language</label>
