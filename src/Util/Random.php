@@ -29,7 +29,7 @@ class Random
 
         while (strlen($result) < $length) {
             $bytes = random_bytes($length * 2); // Generate enough bytes
-            $result = substr(str_replace(['+', '/', '='], '', base64_encode($bytes)), 0, $length);
+            $result = substr(str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($bytes)), 0, $length);
         }
 
         return $result;
