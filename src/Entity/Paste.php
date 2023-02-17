@@ -22,28 +22,22 @@ namespace App\Entity;
 
 abstract class Paste
 {
-    private readonly ?int $id;
+    private readonly ?string $id;
     private readonly ?string $title;
 
-    public function __construct(?int $id, ?string $title)
+    public function __construct(?string $id, ?string $title)
     {
         $this->id = $id;
         $this->title = $title;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getId() :?int
+    public function getId() :?string
     {
         return $this->id;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTitle() :?string
     {
-        return $this->title ?? $this->id;
+        return $this->title;
     }
 }

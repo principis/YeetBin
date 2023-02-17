@@ -131,7 +131,7 @@ class Database
         }
 
         return new TextPaste(
-            $data['id'],
+            $data['uid'],
             $data['title'],
             $data['lang'],
             $data['content']

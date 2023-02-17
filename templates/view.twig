@@ -26,15 +26,15 @@
     <script src="{{ asset('assets/dist/view.js') }}"></script>
 {% endblock %}
 
-{% set title = 'Paste ' ~ paste.title ~' | YeetBin' %}
+{% set title = 'Paste ' ~ paste.title ?? paste.id ~' | YeetBin' %}
 
 {% block body %}
     <div class="card shadow-sm mt-4 mb-5">
         <div class="d-flex flex-row align-items-stretch">
             <div class="card-header d-flex flex-grow-1 flex-row align-items-center overflow-hidden px-2">
-                <p class="mb-0 text-truncate" data-bs-toggle="tooltip" title="{{ paste.title|escape }}"
+                <p class="mb-0 text-truncate" data-bs-toggle="tooltip" title="{{ paste.title ?? paste.id|escape }}"
                    data-bs-delay='{"show":300,"hide":100}'>
-                    <i class="bi bi-code-square ps-2"></i> {{ paste.title|escape }}
+                    <i class="bi bi-code-square ps-2"></i> {{ paste.title ?? paste.id|escape }}
                 </p>
             </div>
             <div class="card-header d-flex align-items-center py-0 px-1">

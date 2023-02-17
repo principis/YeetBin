@@ -26,7 +26,7 @@ class TextPaste extends Paste
 
     private readonly string $content;
 
-    public function __construct(?int $id, ?string $title, string $language, string $content)
+    public function __construct(?string $id, ?string $title, string $language, string $content)
     {
         parent::__construct($id, $title);
 
