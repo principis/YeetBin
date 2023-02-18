@@ -8,8 +8,8 @@ return static function (RouteConfigurator $routes) {
     $routes->add('home', '/')
         ->controller([Controller\DefaultController::class, 'index'])
         ->methods(['GET']);
-    $routes->add('add', '/add/{type}')
-        ->controller([Controller\AddController::class, 'add'])
+    $routes->add('add_text', '/add/text')
+        ->controller([Controller\AddController::class, 'text'])
         ->methods(['POST']);
     $routes->add('view', '/view/{id}')
         ->controller([Controller\ViewController::class, 'view'])

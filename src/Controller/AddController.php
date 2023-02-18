@@ -31,26 +31,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddController
 {
-    public function add(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, string $type) :Response
+    public function text(Request $request, UrlGeneratorInterface $urlGenerator, Database $db) :Response
     {
-        if (!$request->request->has('paste')) {
-            throw new BadRequestHttpException();
-        }
+        $paste = $this->getPasteFromRequest($request);
+        $title = $paste['title'] ?? null;
+        $language = $paste['language'] ?? null;
+        $content = $paste['content'] ?? null;
 
-        $paste = $request->request->all('paste');
-        $paste = array_filter(array_map('trim', $paste), 'strlen');
-
-        return match ($type) {
-            'text' => $this->textPaste($paste, $urlGenerator, $db),
-            default => throw new BadRequestHttpException('Unknown paste type')
-        };
-    }
-
-    private function textPaste(array $formData, UrlGeneratorInterface $urlGenerator, Database $db) :Response
-    {
-        $title = $formData['title'] ?? null;
-        $language = $formData['language'] ?? null;
-        $content = $formData['content'] ?? null;
         if ($content === null) {
             throw new BadRequestHttpException("Empty paste is not allowed!");
         }
@@ -64,5 +51,16 @@ class AddController
         $id = $db->addPaste(new TextPaste(null, $title, $language, $content));
 
         return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
+    }
+
+    private function getPasteFromRequest(Request $request) :array
+    {
+        if (!$request->request->has('paste')) {
+            throw new BadRequestHttpException();
+        }
+
+        $paste = $request->request->all('paste');
+
+        return array_filter(array_map('trim', $paste), 'strlen');
     }
 }

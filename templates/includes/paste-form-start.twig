@@ -1,1 +1,1 @@
-<form method="post" action="{{ path('add', {type: paste_type}) }}">
+<form method="post" action="{{ path('add_'~paste_type) }}" {{ extra_form_opt|raw }}>
