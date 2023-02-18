@@ -21,9 +21,11 @@
 namespace App\Controller;
 
 use App\Database\Database;
+use App\Entity\FilePaste;
 use App\Entity\Paste;
 use App\Entity\TextPaste;
 use App\Ui\Ui;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -36,7 +38,8 @@ class ViewController
         $paste = self::getPaste($db, $id);
 
         return match (get_class($paste)) {
-            TextPaste::class => $this->viewText($ui, $paste)
+            TextPaste::class => $this->viewText($ui, $paste),
+            FilePaste::class => $this->viewFile($ui, $paste)
         };
     }
 
@@ -62,6 +65,22 @@ class ViewController
         return new Response($ui->render());
     }
 
+    private function viewFile(Ui $ui, FilePaste $paste) :Response
+    {
+        $ui->setTemplate('view_file.twig');
+        $ui->addArg('paste', $paste);
+
+        $ui->addArg('paste_bytes', $paste->getFile()->getSize());
+        $content = $paste->getContent();
+
+        if ($content !== null) {
+            $ui->addArg('content', $content);
+            $ui->addArg('paste_lines', substr_count($content, "\n") + (empty($content) ? 0 : 1));
+        }
+
+        return new Response($ui->render());
+    }
+
     public function raw(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
@@ -78,7 +97,8 @@ class ViewController
         $paste = self::getPaste($db, $id);
 
         return match (get_class($paste)) {
-            TextPaste::class => $this->downloadText($paste)
+            TextPaste::class => $this->downloadText($paste),
+            FilePaste::class => $this->downloadFile($paste)
         };
     }
 
@@ -91,6 +111,18 @@ class ViewController
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename);
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', 'text/plain; charset=UTF-8');
+
+        return $response;
+    }
+
+    public function downloadFile(FilePaste $paste) :BinaryFileResponse
+    {
+        $response = new BinaryFileResponse($paste->getFile());
+        $response->headers->set('Content-Type', $paste->getMimeType());
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $paste->getName()
+        );
 
         return $response;
     }
