@@ -89,7 +89,7 @@ class ViewController
             throw new NotAcceptableHttpException("This paste does not support this operation.");
         }
 
-        return new Response($content, 200, ['content-type' => 'text/plain; charset=UTF-8']);
+        return new Response($content, 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
 
     public function download(Database $db, string $id) :Response
