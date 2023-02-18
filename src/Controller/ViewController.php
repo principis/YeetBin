@@ -21,11 +21,13 @@
 namespace App\Controller;
 
 use App\Database\Database;
+use App\Entity\Paste;
 use App\Entity\TextPaste;
 use App\Ui\Ui;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 class ViewController
 {
@@ -33,13 +35,12 @@ class ViewController
     {
         $paste = self::getPaste($db, $id);
 
-        $ui->setTemplate('view.twig');
-        $ui->addArg('paste', $paste);
-
-        return new Response($ui->render());
+        return match (get_class($paste)) {
+            TextPaste::class => $this->viewText($ui, $paste)
+        };
     }
 
-    private static function getPaste(Database $db, string $id) :TextPaste
+    private static function getPaste(Database $db, string $id) :Paste
     {
         $paste = $db->getPaste($id);
         if ($paste === false) {
@@ -49,24 +50,45 @@ class ViewController
         return $paste;
     }
 
+    private function viewText(Ui $ui, TextPaste $paste) :Response
+    {
+        $ui->setTemplate('view_text.twig');
+        $ui->addArg('paste', $paste);
+
+        $content = $paste->getContent();
+
+        return new Response($ui->render());
+    }
+
     public function raw(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
+        $content = $paste->getContent();
+        if ($content === null) {
+            throw new NotAcceptableHttpException("This paste does not support this operation.");
+        }
 
-        return new Response($paste->getContent(), 200, ['content-type' => 'text/plain; charset=UTF-8']);
+        return new Response($content, 200, ['content-type' => 'text/plain; charset=UTF-8']);
     }
 
     public function download(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
 
-        $filename = $paste->getTitle() ?? $id;
+        return match (get_class($paste)) {
+            TextPaste::class => $this->downloadText($paste)
+        };
+    }
+
+    public function downloadText(TextPaste $paste) :Response
+    {
+        $filename = $paste->getFormattedTitle();
         $filecontent = $paste->getContent() ?? '';
 
         $response = new Response($filecontent);
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename);
         $response->headers->set('Content-Disposition', $disposition);
-        $response->headers->set('content-type','text/plain; charset=UTF-8');
+        $response->headers->set('Content-Type', 'text/plain; charset=UTF-8');
 
         return $response;
     }

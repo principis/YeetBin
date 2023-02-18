@@ -16,25 +16,14 @@
 # along with YeetBin.  If not, see <https://www.gnu.org/licenses/>.
 #}
 
-{% extends 'base.twig' %}
+{% extends 'view.twig' %}
 
-{% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('assets/dist/view.css') }}">
-{% endblock %}
-
-{% block scripts %}
-    <script src="{{ asset('assets/dist/view.js') }}"></script>
-{% endblock %}
-
-{% set title = 'Paste ' ~ paste.formattedTitle ~' | YeetBin' %}
-
-{% block body %}
-    <div class="card shadow-sm mt-4 mb-5">
-        <div class="card-header p-0 d-flex flex-row align-items-stretch">
-            {% include 'includes/paste-titlebar.twig' %}
-        </div>
-
-        {% block paste_view %}
-        {% endblock %}
-    </div>
+{% set paste_icon = 'code-square' %}
+{% set is_text = true %}
+{% block paste_view %}
+<div>
+    <pre class="mb-0"><code id="paste-content"
+                            class="{{ paste.language != 'autodetect' ? 'language-'~paste.language : '' }}"
+                            data-code-language="{{ paste.language }}">{{ paste.content|escape }}</code></pre>
+</div>
 {% endblock %}

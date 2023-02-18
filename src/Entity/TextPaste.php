@@ -49,4 +49,9 @@ class TextPaste extends Paste
     {
         return $this->language;
     }
+
+    function getFormattedTitle() :string
+    {
+        return $this->getTitle() ?? $this->getId();
+    }
 }

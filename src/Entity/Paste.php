@@ -40,4 +40,8 @@ abstract class Paste
     {
         return $this->title;
     }
+
+    abstract function getFormattedTitle() :string;
+
+    abstract function getContent() :?string;
 }

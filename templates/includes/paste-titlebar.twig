@@ -1,0 +1,61 @@
+{#
+# This file is part of YeetBin.
+# Copyright (C) 2023 Arthur Bols
+#
+# YeetBin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# YeetBin is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with YeetBin.  If not, see <https://www.gnu.org/licenses/>.
+#}
+<div class="d-flex flex-grow-1 flex-row align-items-baseline overflow-hidden p-2">
+
+    <i class="bi bi-{{ paste_icon }} ps-2"></i>
+    <div class="text-truncate ms-1" data-bs-toggle="tooltip" title="{{ paste.formattedTitle|escape }}"
+         data-bs-delay='{"show":300,"hide":100}'>
+        {{ paste.formattedTitle|escape }}
+    </div>
+</div>
+<div class="d-flex align-items-center py-0 px-1">
+    <div class="d-none d-md-flex">
+        {% if is_text %}
+            <a href="{{ path('raw', {id: paste.id }) }}" class="btn btn-link nav-link btn-icon px-1"
+               role="button" data-bs-toggle="tooltip" title="View raw">
+                <i class="bi bi-code-slash"></i>
+            </a>
+            <button class="btn-clipboard btn btn-link nav-link btn-icon px-1"
+                    type="button" data-bs-toggle="tooltip" title="Copy to clipboard" data-clipboard-target="#paste-content">
+                <i class="bi bi-clipboard"></i>
+            </button>
+        {% endif %}
+        <a href="{{ path('download', {id: paste.id }) }}" class="btn btn-link nav-link btn-icon px-1 pe-2"
+           role="button" data-bs-toggle="tooltip" title="Download">
+            <i class="bi bi-download"></i>
+        </a>
+    </div>
+    <div class="dropdown">
+        <button class="navbar-toggler d-flex d-md-none px-2 fs-5" type="button" data-bs-toggle="dropdown">
+            <i class="bi bi-three-dots"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+            {% if is_text %}
+                <li>
+                    <a href="{{ path('raw', {id: paste.id }) }}" class="dropdown-item" role="button">View raw</a>
+                </li>
+                <li>
+                    <button class="btn-clipboard dropdown-item" type="button" data-clipboard-target="#paste-content">Copy to clipboard</button>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ path('download', {id: paste.id }) }}" class="dropdown-item" role="button">Download</a>
+            </li>
+        </ul>
+    </div>
+</div>
