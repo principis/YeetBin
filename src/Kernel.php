@@ -21,10 +21,12 @@
 namespace App;
 
 use App\ArgumentResolver\DbResolver;
+use App\ArgumentResolver\ServiceResolver;
 use App\ArgumentResolver\UiResolver;
 use App\ArgumentResolver\UrlGeneratorResolver;
 use App\Config\Config;
 use App\Controller\ErrorController;
+use App\Service\FileUploadHandler;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -91,6 +93,7 @@ class Kernel
         $resolvers[] = new UiResolver($this->routes, $this->context);
         $resolvers[] = new DbResolver();
         $resolvers[] = new UrlGeneratorResolver($this->routes, $this->context);
+        $resolvers[] = new ServiceResolver([FileUploadHandler::class]);
 
         return new Controller\ArgumentResolver(null, $resolvers);
     }

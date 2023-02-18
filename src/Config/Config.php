@@ -50,6 +50,11 @@ class Config
         return dirname(__DIR__, 2).'/var/uploads';
     }
 
+    public function getMaxUploadFileSize() :int
+    {
+        return $this->get('max_upload_file_size') ?? 1024 * 1024;
+    }
+
     public function get(string $key) :mixed
     {
         if (!isset($this->config[$key])) {

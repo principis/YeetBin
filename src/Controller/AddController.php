@@ -21,8 +21,11 @@
 namespace App\Controller;
 
 use App\Database\Database;
+use App\Entity\FilePaste;
 use App\Entity\TextPaste;
+use App\Service\FileUploadHandler;
 use App\Util\Languages;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +34,37 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddController
 {
+    public function file(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, FileUploadHandler $fileHandler) :Response
+    {
+        if (!$request->request->has('paste')
+            || !$request->files->has('paste')
+            || !isset($request->files->get('paste')['content'])) {
+            throw new BadRequestHttpException();
+        }
+
+        $file = $request->files->get('paste')['content'];
+        try {
+            $fileHandler->validate($file);
+        } catch (FileException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        $paste = $this->getPasteFromRequest($request);
+        $title = $paste['title'] ?? null;
+        $filePaste = FilePaste::fromUploadedFile($title, $file);
+
+        $id = $db->addPaste($filePaste);
+        try {
+            $fileHandler->move($file, $id);
+        } catch (FileException) {
+            // Failed to move file, remove paste from DB
+            $db->removePaste($id);
+            throw new \RuntimeException("The file was not uploaded due to an unknown error.");
+        }
+
+        return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
+    }
+
     public function text(Request $request, UrlGeneratorInterface $urlGenerator, Database $db) :Response
     {
         $paste = $this->getPasteFromRequest($request);

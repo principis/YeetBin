@@ -20,6 +20,7 @@
 
 namespace App\Controller;
 
+use App\Config\Config;
 use App\Ui\Ui;
 use App\Util\Languages;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,7 @@ class DefaultController
         $ui->setTemplate('new.twig');
         $ui->addArg('title', 'New Paste | YeetBin');
         $ui->addArg('languages', Languages::getForView());
+        $ui->addArg('max_file_size', Config::getInstance()->getMaxUploadFileSize());
 
         return new Response($ui->render());
     }

@@ -28,6 +28,11 @@
                             type="button" role="tab">Text
                     </button>
                 </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-tab-pane" type="button" role="tab">
+                        File
+                    </button>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -50,6 +55,16 @@
                     <div class="mb-3">
                         <label for="inputCode" class="form-label">Your paste</label>
                         <textarea name="paste[content]" class="form-control" id="inputCode" rows="10"></textarea>
+                    </div>
+                    {% include 'includes/paste-form-end.twig' %}
+                </div>
+                <div id="file-tab-pane" class="tab-pane" role="tabpanel" tabindex="0">
+                    {% include 'includes/paste-form-start.twig' with {paste_type: 'file', extra_form_opt: 'enctype="multipart/form-data"'} %}
+                    {% include 'includes/paste-form-header.twig' %}
+                    <div class="mb-3">
+                        <label for="inputFile" class="form-label">Your paste</label>
+                        <input type="hidden" name="MAX_FILE_SIZE" value="{{ max_file_size }}"/>
+                        <input class="form-control" type="file" id="inputFile" name="paste[content]">
                     </div>
                     {% include 'includes/paste-form-end.twig' %}
                 </div>

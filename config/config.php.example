@@ -8,4 +8,5 @@ return [
         'password' => null,
         'options' => null,
     ],
+    'max_upload_filesize' => 1024*1024,
 ];

@@ -4,6 +4,7 @@
 # Cache and logs
 /var/cache/*
 /var/log/*
+/var/uploads/*
 
 # Config
 /config/config.php
