@@ -21,7 +21,8 @@
         "symfony/http-kernel": "^6.2",
         "symfony/asset": "^6.2",
         "symfony/twig-bridge": "^6.2",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "symfony/mime": "^6.2"
     },
     "require-dev": {
         "symfony/var-dumper": "^6.2"

@@ -45,6 +45,11 @@ class Config
         return self::$instance;
     }
 
+    public static function getUploadDirectory() :string
+    {
+        return dirname(__DIR__, 2).'/var/uploads';
+    }
+
     public function get(string $key) :mixed
     {
         if (!isset($this->config[$key])) {

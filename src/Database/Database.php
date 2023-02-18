@@ -20,6 +20,7 @@
 
 namespace App\Database;
 
+use App\Entity\FilePaste;
 use App\Entity\Paste;
 use App\Entity\TextPaste;
 use App\Util\Random;
@@ -54,7 +55,8 @@ class Database
         $stmt->execute([$uid, $type->value, $paste->getTitle()]);
 
         match ($type) {
-            PasteType::TEXT => $this->addTextPaste($this->conn->lastInsertId(), $paste)
+            PasteType::TEXT => $this->addTextPaste($this->conn->lastInsertId(), $paste),
+            PasteType::FILE => $this->addFilePaste($this->conn->lastInsertId(), $paste),
         };
 
         return $uid;
@@ -93,6 +95,33 @@ class Database
     }
 
     /**
+     * Inserts the given FilePaste. Must be called immediately after inserting the abstract Paste.
+     * @param int $pasteID the ID of the abstract Paste.
+     * @param FilePaste $paste
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    private function addFilePaste(int $pasteID, FilePaste $paste) :void
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO file_pastes (paste_id, file_name, file_ext) VALUES (?, ?, ?)'
+        );
+        $stmt->execute([$pasteID, $paste->getOriginalName(), $paste->getOriginalExtension()]);
+    }
+
+    /**
+     * Tries to remove the paste with the given uid.
+     * @param string $uid
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function removePaste(string $uid) :void
+    {
+        $stmt = $this->conn->prepare(
+            'DELETE FROM pastes WHERE uid = ?'
+        );
+        $stmt->execute([$uid]);
+    }
+
+    /**
      * @param string $uid
      * @return Paste|bool The fetched Paste or <b>FALSE</b> if no Paste with the given $uid was found.
      * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
@@ -109,7 +138,8 @@ class Database
         $type = PasteType::from($pasteData['type']);
 
         return match ($type) {
-            PasteType::TEXT => $this->getTextPaste($uid)
+            PasteType::TEXT => $this->getTextPaste($uid),
+            PasteType::FILE => $this->getFilePaste($uid)
         };
     }
 
@@ -135,6 +165,26 @@ class Database
             $data['title'],
             $data['lang'],
             $data['content']
+        );
+    }
+
+    public function getFilePaste(string $uid) :FilePaste|bool
+    {
+        $stmt = $this->conn->prepare(
+            'SELECT * FROM file_pastes AS t INNER JOIN pastes AS p on t.paste_id = p.id WHERE p.uid = ?'
+        );
+        $stmt->execute([$uid]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($data)) {
+            return false;
+        }
+
+        return new FilePaste(
+            $data['uid'],
+            $data['title'],
+            $data['file_name'],
+            $data['file_ext']
         );
     }
 }
