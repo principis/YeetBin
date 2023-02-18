@@ -22,6 +22,14 @@
          data-bs-delay='{"show":300,"hide":100}'>
         {{ paste.formattedTitle|escape }}
     </div>
+    {% if is_text %}
+        <div class="ps-2 ms-2 border-start small">
+            {{ paste_lines }} lines
+        </div>
+    {% endif %}
+    <div class="ps-2 ms-2 border-start small">
+        {{ paste_bytes }} Bytes
+    </div>
 </div>
 <div class="d-flex align-items-center py-0 px-1">
     <div class="d-none d-md-flex">

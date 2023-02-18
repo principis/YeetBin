@@ -56,6 +56,8 @@ class ViewController
         $ui->addArg('paste', $paste);
 
         $content = $paste->getContent();
+        $ui->addArg('paste_bytes', strlen($content));
+        $ui->addArg('paste_lines', substr_count($content, "\n") + (empty($content) ? 0 : 1));
 
         return new Response($ui->render());
     }
