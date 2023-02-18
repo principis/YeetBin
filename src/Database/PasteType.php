@@ -3,6 +3,7 @@
 namespace App\Database;
 
 use App\Entity\FilePaste;
+use App\Entity\ImagePaste;
 use App\Entity\Paste;
 use App\Entity\TextPaste;
 

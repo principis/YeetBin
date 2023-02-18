@@ -22,8 +22,9 @@ namespace App\Controller;
 
 use App\Database\Database;
 use App\Entity\FilePaste;
-use App\Entity\TextPaste;
+use App\Exception\FormParserException;
 use App\Service\FileUploadHandler;
+use App\Service\FormParser;
 use App\Util\Languages;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -34,26 +35,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddController
 {
-    public function file(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, FileUploadHandler $fileHandler) :Response
-    {
-        if (!$request->request->has('paste')
-            || !$request->files->has('paste')
-            || !isset($request->files->get('paste')['content'])) {
-            throw new BadRequestHttpException();
-        }
-
-        $file = $request->files->get('paste')['content'];
+    public function file(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, FormParser $formParser, FileUploadHandler $fileHandler) :Response {
         try {
-            $fileHandler->validate($file);
-        } catch (FileException $e) {
+            $pasteData = $formParser->parsePasteDataFromRequest($request);
+            $file = $formParser->parseFileForm($request);
+        } catch (FormParserException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
 
-        $paste = $this->getPasteFromRequest($request);
-        $title = $paste['title'] ?? null;
-        $filePaste = FilePaste::fromUploadedFile($title, $file);
+        $paste = FilePaste::fromUploadedFile($pasteData['title'], $file);
 
-        $id = $db->addPaste($filePaste);
+        $id = $db->addPaste($paste);
         try {
             $fileHandler->move($file, $id);
         } catch (FileException) {
@@ -65,36 +57,26 @@ class AddController
         return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
     }
 
-    public function text(Request $request, UrlGeneratorInterface $urlGenerator, Database $db) :Response
-    {
-        $paste = $this->getPasteFromRequest($request);
-        $title = $paste['title'] ?? null;
-        $language = $paste['language'] ?? null;
-        $content = $paste['content'] ?? null;
+    public function text(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, FormParser $formParser) :Response {
+        try {
+            $paste = $formParser->parseTextForm($request);
+        } catch (FormParserException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
 
-        if ($content === null) {
+        if (empty($paste->getContent())) {
             throw new BadRequestHttpException("Empty paste is not allowed!");
         }
-        if (strlen($content) > 64000) { // TODO set in config
+        if (strlen($paste->getContent()) > 64000) { // TODO set in config
             throw new BadRequestHttpException("Paste is longer than 64000 bytes!");
         }
-        if ($language === null || $language !== 'autodetect' && Languages::getLanguage($language) === null) {
+        $language = $paste->getLanguage();
+        if ($language !== 'autodetect' && Languages::getLanguage($language) === null) {
             throw new BadRequestHttpException("Language is required!");
         }
 
-        $id = $db->addPaste(new TextPaste(null, $title, $language, $content));
+        $id = $db->addPaste($paste);
 
         return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
-    }
-
-    private function getPasteFromRequest(Request $request) :array
-    {
-        if (!$request->request->has('paste')) {
-            throw new BadRequestHttpException();
-        }
-
-        $paste = $request->request->all('paste');
-
-        return array_filter(array_map('trim', $paste), 'strlen');
     }
 }

@@ -60,10 +60,15 @@ class FilePaste extends Paste
     public function getFile() :File
     {
         if ($this->_file === null) {
-            $this->_file = new File(Config::getUploadDirectory().'/'.$this->getId());
+            $this->_file = new File($this->getPath());
         }
 
         return $this->_file;
+    }
+
+    public function getPath() :string
+    {
+        return Config::getUploadDirectory().'/'.$this->getId();
     }
 
     public function getMimeType() :string

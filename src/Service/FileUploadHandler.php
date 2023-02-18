@@ -26,7 +26,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileUploadHandler
 {
-
     public function validate(UploadedFile $file) :void
     {
         if (!$file->isValid()) {
