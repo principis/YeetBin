@@ -20,12 +20,13 @@
 
 namespace App\Entity;
 
-use App\Config\Config;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePaste extends Paste
 {
+
+    use FileTrait;
 
     private readonly string $originalName;
     private readonly string $originalExtension;
@@ -55,25 +56,6 @@ class FilePaste extends Paste
         }
 
         return null;
-    }
-
-    public function getFile() :File
-    {
-        if ($this->_file === null) {
-            $this->_file = new File($this->getPath());
-        }
-
-        return $this->_file;
-    }
-
-    public function getPath() :string
-    {
-        return Config::getUploadDirectory().'/'.$this->getId();
-    }
-
-    public function getMimeType() :string
-    {
-        return $this->getFile()->getMimeType();
     }
 
     public function getOriginalExtension() :?string

@@ -21,8 +21,10 @@
 namespace App\Database;
 
 use App\Entity\FilePaste;
+use App\Entity\ImagePaste;
 use App\Entity\Paste;
 use App\Entity\TextPaste;
+use App\Util\ImageFormat;
 use App\Util\Random;
 use PDO;
 use PDOException;
@@ -57,6 +59,7 @@ class Database
         match ($type) {
             PasteType::TEXT => $this->addTextPaste($this->conn->lastInsertId(), $paste),
             PasteType::FILE => $this->addFilePaste($this->conn->lastInsertId(), $paste),
+            PasteType::IMAGE => $this->addImagePaste($this->conn->lastInsertId(), $paste),
         };
 
         return $uid;
@@ -109,6 +112,20 @@ class Database
     }
 
     /**
+     * Inserts the given ImagePaste. Must be called immediately after inserting the abstract Paste.
+     * @param int $pasteID the ID of the abstract Paste.
+     * @param ImagePaste $paste
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    private function addImagePaste(int $pasteID, ImagePaste $paste) :void
+    {
+        $stmt = $this->conn->prepare(
+            'INSERT INTO image_pastes (paste_id, format) VALUES (?, ?)'
+        );
+        $stmt->execute([$pasteID, $paste->getFormat()->value]);
+    }
+
+    /**
      * Tries to remove the paste with the given uid.
      * @param string $uid
      * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
@@ -139,7 +156,8 @@ class Database
 
         return match ($type) {
             PasteType::TEXT => $this->getTextPaste($uid),
-            PasteType::FILE => $this->getFilePaste($uid)
+            PasteType::FILE => $this->getFilePaste($uid),
+            PasteType::IMAGE => $this->getImagePaste($uid),
         };
     }
 
@@ -190,6 +208,30 @@ class Database
             $data['title'],
             $data['file_name'],
             $data['file_ext']
+        );
+    }
+
+    /**
+     * @param string $uid
+     * @return TextPaste|false The fetched ImagePaste or <b>FALSE</b> if no ImagePaste with the given $uid was found.
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function getImagePaste(string $uid) :ImagePaste|false
+    {
+        $stmt = $this->conn->prepare(
+            'SELECT * FROM image_pastes AS t INNER JOIN pastes AS p on t.paste_id = p.id WHERE p.uid = ?'
+        );
+        $stmt->execute([$uid]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (empty($data)) {
+            return false;
+        }
+
+        return new ImagePaste(
+            $data['uid'],
+            $data['title'],
+            ImageFormat::from($data['format']),
         );
     }
 }
