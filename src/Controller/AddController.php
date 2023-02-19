@@ -84,10 +84,9 @@ class AddController
                 isset($pasteData['resize']),
                 $paste->getFormat(),
             );
-        } catch (\ImagickException $e) {
+        } catch (\ImagickException) {
             // Failed to process image, remove paste from DB
             $db->removePaste($id);
-            dump($e);
             throw new \RuntimeException("The file was not uploaded due to an unknown error.");
         }
 
