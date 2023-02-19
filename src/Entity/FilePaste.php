@@ -40,9 +40,9 @@ class FilePaste extends Paste
         $this->originalExtension = $originalExtension;
     }
 
-    public static function fromUploadedFile(?string $title, UploadedFile $file) :FilePaste
+    public static function fromUploadedFile(?string $title, UploadedFile $file) :static
     {
-        return new self(null, $title, $file->getClientOriginalName(), $file->getClientOriginalExtension());
+        return new static(null, $title, $file->getClientOriginalName(), $file->getClientOriginalExtension());
     }
 
     public function getContent() :?string

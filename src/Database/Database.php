@@ -123,10 +123,10 @@ class Database
 
     /**
      * @param string $uid
-     * @return Paste|bool The fetched Paste or <b>FALSE</b> if no Paste with the given $uid was found.
+     * @return Paste|false The fetched Paste or <b>FALSE</b> if no Paste with the given $uid was found.
      * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
      */
-    public function getPaste(string $uid) :Paste|bool
+    public function getPaste(string $uid) :Paste|false
     {
         $stmt = $this->conn->prepare('SELECT type FROM pastes WHERE uid = ?;');
         $stmt->execute([$uid]);
@@ -145,10 +145,10 @@ class Database
 
     /**
      * @param string $uid
-     * @return TextPaste|bool The fetched TextPaste or <b>FALSE</b> if no TextPaste with the given $uid was found.
+     * @return TextPaste|false The fetched TextPaste or <b>FALSE</b> if no TextPaste with the given $uid was found.
      * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
      */
-    public function getTextPaste(string $uid) :TextPaste|bool
+    public function getTextPaste(string $uid) :TextPaste|false
     {
         $stmt = $this->conn->prepare(
             'SELECT * FROM text_pastes AS t INNER JOIN pastes AS p on t.paste_id = p.id WHERE p.uid = ?'
@@ -168,7 +168,12 @@ class Database
         );
     }
 
-    public function getFilePaste(string $uid) :FilePaste|bool
+    /**
+     * @param string $uid
+     * @return TextPaste|false The fetched FilePaste or <b>FALSE</b> if no FilePaste with the given $uid was found.
+     * @throws PDOException On error if PDO::ERRMODE_EXCEPTION option is true.
+     */
+    public function getFilePaste(string $uid) :FilePaste|false
     {
         $stmt = $this->conn->prepare(
             'SELECT * FROM file_pastes AS t INNER JOIN pastes AS p on t.paste_id = p.id WHERE p.uid = ?'
