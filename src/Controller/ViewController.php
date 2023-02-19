@@ -22,6 +22,7 @@ namespace App\Controller;
 
 use App\Database\Database;
 use App\Entity\FilePaste;
+use App\Entity\ImagePaste;
 use App\Entity\Paste;
 use App\Entity\TextPaste;
 use App\Ui\Ui;
@@ -39,7 +40,8 @@ class ViewController
 
         return match (get_class($paste)) {
             TextPaste::class => $this->viewText($ui, $paste),
-            FilePaste::class => $this->viewFile($ui, $paste)
+            FilePaste::class => $this->viewFile($ui, $paste),
+            ImagePaste::class => $this->viewImage($ui, $paste),
         };
     }
 
@@ -81,9 +83,30 @@ class ViewController
         return new Response($ui->render());
     }
 
+    private function viewImage(Ui $ui, ImagePaste $paste) :Response
+    {
+        $ui->setTemplate('view_image.twig');
+        $ui->addArg('paste', $paste);
+
+        $ui->addArg('paste_bytes', $paste->getFile()->getSize());
+        $content = $paste->getContent();
+
+        if ($content !== null) {
+            $ui->addArg('content', $content);
+            $ui->addArg('paste_lines', substr_count($content, "\n") + (empty($content) ? 0 : 1));
+        }
+
+        return new Response($ui->render());
+    }
+
     public function raw(Database $db, string $id) :Response
     {
         $paste = self::getPaste($db, $id);
+
+        if ($paste instanceof ImagePaste) {
+            return $this->downloadImage($paste, ResponseHeaderBag::DISPOSITION_INLINE);
+        }
+
         $content = $paste->getContent();
         if ($content === null) {
             throw new NotAcceptableHttpException("This paste does not support this operation.");
@@ -98,7 +121,8 @@ class ViewController
 
         return match (get_class($paste)) {
             TextPaste::class => $this->downloadText($paste),
-            FilePaste::class => $this->downloadFile($paste)
+            FilePaste::class => $this->downloadFile($paste),
+            ImagePaste::class => $this->downloadImage($paste),
         };
     }
 
@@ -122,6 +146,18 @@ class ViewController
         $response->setContentDisposition(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
             $paste->getName()
+        );
+
+        return $response;
+    }
+
+    public function downloadImage(ImagePaste $paste, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT) :BinaryFileResponse
+    {
+        $response = new BinaryFileResponse($paste->getFile());
+        $response->headers->set('Content-Type', $paste->getMimeType());
+        $response->setContentDisposition(
+            $disposition,
+            $paste->getFormattedTitle()
         );
 
         return $response;
