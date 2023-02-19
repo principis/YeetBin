@@ -33,6 +33,11 @@
                         File
                     </button>
                 </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-tab-pane" type="button" role="tab">
+                        Image
+                    </button>
+                </li>
             </ul>
         </div>
         <div class="card-body">
@@ -65,6 +70,42 @@
                         <label for="inputFile" class="form-label">Your paste</label>
                         <input type="hidden" name="MAX_FILE_SIZE" value="{{ max_file_size }}"/>
                         <input class="form-control" type="file" id="inputFile" name="paste[content]">
+                    </div>
+                    {% include 'includes/paste-form-end.twig' %}
+                </div>
+                <div id="image-tab-pane" class="tab-pane" role="tabpanel" tabindex="0">
+                    {% include 'includes/paste-form-start.twig' with {paste_type: 'image', extra_form_opt: 'enctype="multipart/form-data"'} %}
+                    {% include 'includes/paste-form-header.twig' %}
+                    <div class="mb-3">
+                        <span>Image options</span>
+                        <div>
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="checkStrip" name="paste[strip]" checked>
+                                <label class="form-check-label" for="checkStrip">Strip EXIF</label>
+                            </div>
+                            <div class="form-check form-check-inline form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="checkResize" name="paste[resize]" checked>
+                                <label class="form-check-label" for="checkResize">Resize FHD</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <span>Image format</span>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="formatPNG" name="paste[format]" value="PNG" checked>
+                                <label class="form-check-label" for="formatPNG">PNG</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="formatJPG" name="paste[format]" value="JPG">
+                                <label class="form-check-label" for="formatJPG">JPG</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputImage" class="form-label">Your paste</label>
+                        <input type="hidden" name="MAX_FILE_SIZE" value="{{ max_file_size }}"/>
+                        <input class="form-control" type="file" id="inputImage" name="paste[content]">
                     </div>
                     {% include 'includes/paste-form-end.twig' %}
                 </div>

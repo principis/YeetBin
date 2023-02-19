@@ -22,9 +22,12 @@ namespace App\Controller;
 
 use App\Database\Database;
 use App\Entity\FilePaste;
+use App\Entity\ImagePaste;
 use App\Exception\FormParserException;
 use App\Service\FileUploadHandler;
 use App\Service\FormParser;
+use App\Service\ImageHelper;
+use App\Util\ImageFormat;
 use App\Util\Languages;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -51,6 +54,40 @@ class AddController
         } catch (FileException) {
             // Failed to move file, remove paste from DB
             $db->removePaste($id);
+            throw new \RuntimeException("The file was not uploaded due to an unknown error.");
+        }
+
+        return new RedirectResponse($urlGenerator->generate('view', ['id' => $id]));
+    }
+
+    public function image(Request $request, UrlGeneratorInterface $urlGenerator, Database $db, FormParser $formParser, ImageHelper $imageHandler): Response
+    {
+        $pasteData = $formParser->parsePasteDataFromRequest($request, ['format']);
+        $file = $formParser->parseFileForm($request);
+
+        if (!$imageHandler->isImage($file)) {
+            throw new BadRequestHttpException('The file is not an image.');
+        }
+
+        $paste = new ImagePaste(
+            null,
+            $pasteData['title'],
+            ImageFormat::tryFrom($pasteData['format']) ?? ImageFormat::PNG
+        );
+
+        $id = $db->addPaste($paste);
+        try {
+            $imageHandler->processImage(
+                $file,
+                $id,
+                isset($pasteData['strip']),
+                isset($pasteData['resize']),
+                $paste->getFormat(),
+            );
+        } catch (\ImagickException $e) {
+            // Failed to process image, remove paste from DB
+            $db->removePaste($id);
+            dump($e);
             throw new \RuntimeException("The file was not uploaded due to an unknown error.");
         }
 
