@@ -28,6 +28,7 @@ use App\Config\Config;
 use App\Controller\ErrorController;
 use App\Service\FileUploadHandler;
 use App\Service\FormParser;
+use App\Service\ImageHelper;
 use Symfony\Component\ErrorHandler\Debug;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -94,7 +95,7 @@ class Kernel
         $resolvers[] = new UiResolver($this->routes, $this->context);
         $resolvers[] = new DbResolver();
         $resolvers[] = new UrlGeneratorResolver($this->routes, $this->context);
-        $resolvers[] = new ServiceResolver([FileUploadHandler::class, FormParser::class]);
+        $resolvers[] = new ServiceResolver([FileUploadHandler::class, FormParser::class, ImageHelper::class]);
 
         return new Controller\ArgumentResolver(null, $resolvers);
     }
