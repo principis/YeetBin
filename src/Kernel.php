@@ -27,7 +27,11 @@ use App\ArgumentResolver\UiResolver;
 use App\ArgumentResolver\UrlGeneratorResolver;
 use App\Config\Config;
 use App\Controller\ErrorController;
+use App\EventListener\AuthenticationListener;
+use App\EventListener\FirewallListener;
 use App\Security\Authentication\AuthenticationManager;
+use App\Security\Authorization\AuthorizationChecker;
+use App\Security\Firewall;
 use App\Service\FileUploadHandler;
 use App\Service\FormParser;
 use App\Service\ImageHelper;
@@ -55,6 +59,7 @@ class Kernel
     private Routing\RouteCollection $routes;
     private RequestContext $context;
     private Routing\Matcher\UrlMatcher $matcher;
+    private Firewall $firewall;
     private AuthenticationManager $authManager;
     private UrlGeneratorInterface $urlGenerator;
 
@@ -75,6 +80,8 @@ class Kernel
         $this->context->fromRequest($this->request);
         $this->matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->context);
 
+        $authChecker = new AuthorizationChecker($this->session);
+        $this->firewall = new Firewall($authChecker, $config->get('firewall')['routes'] ?? []);
         $this->authManager = new AuthenticationManager($this->session);
         $this->authManager->configure($this->routes);
         $this->urlGenerator = new Routing\Generator\UrlGenerator($this->routes, $this->context);
@@ -98,6 +105,8 @@ class Kernel
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new RouterListener($this->matcher, $this->requestStack));
         $dispatcher->addSubscriber(new ErrorListener([ErrorController::class, 'error']));
+        $dispatcher->addSubscriber(new AuthenticationListener($this->urlGenerator));
+        $dispatcher->addSubscriber(new FirewallListener($this->firewall));
 
         return $dispatcher;
     }
