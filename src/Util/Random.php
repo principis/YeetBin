@@ -22,7 +22,6 @@ namespace App\Util;
 
 class Random
 {
-
     public static function pasteId(int $length) :string
     {
         $result = '';
@@ -35,4 +34,10 @@ class Random
         return $result;
     }
 
+    public static function generateToken() :string
+    {
+        $bytes = random_bytes(32);
+
+        return str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($bytes));
+    }
 }

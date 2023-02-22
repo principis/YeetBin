@@ -33,6 +33,10 @@
         const activeThemeIcon = document.querySelector('.theme-icon-active');
         let currentSvgClass = null;
 
+        if (activeThemeIcon === null) {
+            return;
+        }
+
         activeThemeIcon.classList.forEach((el) => {
             if (el.startsWith('bi-')) {
                 currentSvgClass = el;

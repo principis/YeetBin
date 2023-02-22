@@ -23,6 +23,7 @@ Encore
     .addEntry('app', './assets/app.js')
     .addEntry('color-mode', './assets/color-mode.js')
     .addEntry('view', './assets/view.js')
+    .addStyleEntry('login', './assets/styles/login.scss')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     // .splitEntryChunks()

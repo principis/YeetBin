@@ -54,6 +54,7 @@ class AuthenticationManager
     {
         return match ($this->name) {
             'basic' => BasicAuthenticator::class,
+            'form' => FormAuthenticator::class,
             default => null
         };
     }

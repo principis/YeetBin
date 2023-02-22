@@ -1,0 +1,54 @@
+{#
+# This file is part of YeetBin.
+# Copyright (C) 2023 Arthur Bols
+#
+# YeetBin is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# YeetBin is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with YeetBin.  If not, see <https://www.gnu.org/licenses/>.
+#}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | YeetBin</title>
+
+    <script src="{{ asset('assets/dist/runtime.js') }}"></script>
+    <link href="{{ asset('assets/dist/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/dist/login.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/dist/color-mode.js') }}"></script>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="d-flex align-items-center py-4 bg-secondary-subtle">
+<main class="text-center form-signin w-100 m-auto">
+    <form action="{{ path('login') }}" class="card-body" method="post">
+        <h1 class="h1 mb-4 fw-normal">YeetBin</h1>
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        <div class="form-floating">
+            <input type="text" class="form-control rounded-bottom-0" id="floatingInput" name="username" placeholder="name">
+            <label for="floatingInput">Username</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control rounded-top-0 mb-2" id="floatingPassword" name="password" placeholder="Password">
+            <label for="floatingPassword">Password</label>
+        </div>
+
+        {% if error %}
+            <div class="text-danger mb-2">{{ error }}</div>
+        {% endif %}
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+    </form>
+</main>
+</body>
+</html>
