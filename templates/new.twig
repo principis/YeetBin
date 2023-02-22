@@ -18,23 +18,27 @@
 
 {% extends 'base.twig' %}
 
+{% set text_active = is_allowed('add_text') ? 'active' :'' %}
+{% set file_active = not text_active and is_allowed('add_file') ? 'active' :'' %}
+{% set image_active = not text_active and not file_active and is_allowed('add_image') ? 'active' :'' %}
+
 {% block body %}
     <h1 class="mb-4">New Paste</h1>
     <div class="card shadow-sm">
         <div class="card-header">
             <ul class="nav nav-tabs card-header-tabs" role="tablist">
                 <li class="nav-item">
-                    <button class="nav-link active" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-tab-pane"
-                            type="button" role="tab">Text
+                    <button class="nav-link {{ text_active ? 'active' :'' }}" id="text-tab" data-bs-toggle="tab" data-bs-target="#text-tab-pane"
+                            type="button" role="tab" {{ is_allowed('add_text') ? '' :'disabled' }}>Text
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-tab-pane" type="button" role="tab">
+                    <button class="nav-link {{ file_active ? 'active' :'' }}" id="file-tab" data-bs-toggle="tab" data-bs-target="#file-tab-pane" type="button" role="tab" {{ is_allowed('add_file') ? '' :'disabled' }}>
                         File
                     </button>
                 </li>
                 <li class="nav-item">
-                    <button class="nav-link" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-tab-pane" type="button" role="tab">
+                    <button class="nav-link {{ image_active ? 'active' :'' }}" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-tab-pane" type="button" role="tab" {{ is_allowed('add_image') ? '' :'disabled' }}>
                         Image
                     </button>
                 </li>
@@ -42,7 +46,7 @@
         </div>
         <div class="card-body">
             <div id="tabContent" class="tab-content">
-                <div id="text-tab-pane" class="tab-pane active" role="tabpanel" tabindex="0">
+                <div id="text-tab-pane" class="tab-pane {{ is_allowed('add_text') ? 'active' :'' }}" role="tabpanel" tabindex="0">
                     {% include 'includes/paste-form-start.twig' with {paste_type: 'text'} %}
                     {% set language_block %}
                         <div class="col-auto">
@@ -63,7 +67,7 @@
                     </div>
                     {% include 'includes/paste-form-end.twig' %}
                 </div>
-                <div id="file-tab-pane" class="tab-pane" role="tabpanel" tabindex="0">
+                <div id="file-tab-pane" class="tab-pane {{ not is_allowed('add_text') and is_allowed('add_file') ? 'active' :'' }}" role="tabpanel" tabindex="0">
                     {% include 'includes/paste-form-start.twig' with {paste_type: 'file', extra_form_opt: 'enctype="multipart/form-data"'} %}
                     {% include 'includes/paste-form-header.twig' %}
                     <div class="mb-3">
@@ -73,7 +77,7 @@
                     </div>
                     {% include 'includes/paste-form-end.twig' %}
                 </div>
-                <div id="image-tab-pane" class="tab-pane" role="tabpanel" tabindex="0">
+                <div id="image-tab-pane" class="tab-pane {{ image_active ? 'active' :'' }}" role="tabpanel" tabindex="0">
                     {% include 'includes/paste-form-start.twig' with {paste_type: 'image', extra_form_opt: 'enctype="multipart/form-data"'} %}
                     {% include 'includes/paste-form-header.twig' %}
                     <div class="mb-3">

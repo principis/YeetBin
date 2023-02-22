@@ -114,7 +114,7 @@ class Kernel
     private function getArgumentResolver() :Controller\ArgumentResolver
     {
         $resolvers = Controller\ArgumentResolver::getDefaultArgumentValueResolvers();
-        $resolvers[] = new UiResolver($this->urlGenerator);
+        $resolvers[] = new UiResolver($this->urlGenerator, $this->authManager, $this->firewall);
         $resolvers[] = new DbResolver();
         $resolvers[] = new UrlGeneratorResolver($this->routes, $this->context);
         $resolvers[] = new AuthenticationManagerResolver($this->authManager);

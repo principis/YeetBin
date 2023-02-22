@@ -20,6 +20,8 @@
 
 namespace App\ArgumentResolver;
 
+use App\Security\Authentication\AuthenticationManager;
+use App\Security\Firewall;
 use App\Ui\Ui;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -29,10 +31,17 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class UiResolver implements ValueResolverInterface
 {
     private UrlGeneratorInterface $urlGenerator;
+    private AuthenticationManager $authManager;
+    private Firewall $firewall;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        AuthenticationManager $authManager,
+        Firewall $firewall
+    ) {
         $this->urlGenerator = $urlGenerator;
+        $this->authManager = $authManager;
+        $this->firewall = $firewall;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument) :iterable
@@ -42,7 +51,7 @@ class UiResolver implements ValueResolverInterface
             return [];
         }
 
-        $ui = new Ui($request, $this->urlGenerator);
+        $ui = new Ui($request, $this->urlGenerator, $this->authManager, $this->firewall);
 
         return [$ui];
     }

@@ -21,6 +21,10 @@
 namespace App\Ui;
 
 use App\Config\Config;
+use App\Security\Authentication\AuthenticationManager;
+use App\Security\Firewall;
+use App\Ui\Extension\AuthenticationExtension;
+use App\Ui\Extension\FirewallExtension;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Asset\Packages;
@@ -42,7 +46,7 @@ class Ui
     private TemplateWrapper $template;
     private array $args = [];
 
-    public function __construct(Request $request, UrlGeneratorInterface $urlGenerator)
+    public function __construct(Request $request, UrlGeneratorInterface $urlGenerator, AuthenticationManager $authManager, Firewall $firewall)
     {
         $twigLoader = new FilesystemLoader(dirname(__DIR__, 2).'/templates');
 
@@ -57,6 +61,8 @@ class Ui
         $packages = new Packages($defaultPackage);
         $this->twig->addExtension(new AssetExtension($packages));
         $this->twig->addExtension(new RoutingExtension($urlGenerator));
+        $this->twig->addExtension(new AuthenticationExtension($authManager));
+        $this->twig->addExtension(new FirewallExtension($firewall));
 
         if (Config::getInstance()->isDebug()) {
             $this->twig->addExtension(new DebugExtension());
