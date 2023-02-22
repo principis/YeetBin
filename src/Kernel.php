@@ -20,12 +20,14 @@
 
 namespace App;
 
+use App\ArgumentResolver\AuthenticationManagerResolver;
 use App\ArgumentResolver\DbResolver;
 use App\ArgumentResolver\ServiceResolver;
 use App\ArgumentResolver\UiResolver;
 use App\ArgumentResolver\UrlGeneratorResolver;
 use App\Config\Config;
 use App\Controller\ErrorController;
+use App\Security\Authentication\AuthenticationManager;
 use App\Service\FileUploadHandler;
 use App\Service\FormParser;
 use App\Service\ImageHelper;
@@ -34,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Controller;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
@@ -48,9 +51,11 @@ class Kernel
 {
     private Request $request;
     private RequestStack $requestStack;
+    private Session $session;
     private Routing\RouteCollection $routes;
     private RequestContext $context;
     private Routing\Matcher\UrlMatcher $matcher;
+    private AuthenticationManager $authManager;
     private UrlGeneratorInterface $urlGenerator;
 
     public function __construct()
@@ -62,11 +67,16 @@ class Kernel
 
         $this->request = Request::createFromGlobals();
         $this->requestStack = new RequestStack();
+        $this->session = new Session();
+        $this->request->setSession($this->session);
         $this->routes = $config::loadRoutes();
 
         $this->context = new Routing\RequestContext();
         $this->context->fromRequest($this->request);
         $this->matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->context);
+
+        $this->authManager = new AuthenticationManager($this->session);
+        $this->authManager->configure($this->routes);
         $this->urlGenerator = new Routing\Generator\UrlGenerator($this->routes, $this->context);
     }
 
@@ -98,6 +108,7 @@ class Kernel
         $resolvers[] = new UiResolver($this->urlGenerator);
         $resolvers[] = new DbResolver();
         $resolvers[] = new UrlGeneratorResolver($this->routes, $this->context);
+        $resolvers[] = new AuthenticationManagerResolver($this->authManager);
         $resolvers[] = new ServiceResolver([FileUploadHandler::class, FormParser::class, ImageHelper::class]);
 
         return new Controller\ArgumentResolver(null, $resolvers);
