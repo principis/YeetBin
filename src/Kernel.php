@@ -40,6 +40,7 @@ use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
 
@@ -50,6 +51,7 @@ class Kernel
     private Routing\RouteCollection $routes;
     private RequestContext $context;
     private Routing\Matcher\UrlMatcher $matcher;
+    private UrlGeneratorInterface $urlGenerator;
 
     public function __construct()
     {
@@ -65,6 +67,7 @@ class Kernel
         $this->context = new Routing\RequestContext();
         $this->context->fromRequest($this->request);
         $this->matcher = new Routing\Matcher\UrlMatcher($this->routes, $this->context);
+        $this->urlGenerator = new Routing\Generator\UrlGenerator($this->routes, $this->context);
     }
 
     public function run() :void
@@ -92,7 +95,7 @@ class Kernel
     private function getArgumentResolver() :Controller\ArgumentResolver
     {
         $resolvers = Controller\ArgumentResolver::getDefaultArgumentValueResolvers();
-        $resolvers[] = new UiResolver($this->routes, $this->context);
+        $resolvers[] = new UiResolver($this->urlGenerator);
         $resolvers[] = new DbResolver();
         $resolvers[] = new UrlGeneratorResolver($this->routes, $this->context);
         $resolvers[] = new ServiceResolver([FileUploadHandler::class, FormParser::class, ImageHelper::class]);

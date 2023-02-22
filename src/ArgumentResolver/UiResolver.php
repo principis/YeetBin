@@ -24,19 +24,15 @@ use App\Ui\Ui;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\Routing\Generator\UrlGenerator;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UiResolver implements ValueResolverInterface
 {
-    private RouteCollection $routes;
-    private RequestContext $context;
+    private UrlGeneratorInterface $urlGenerator;
 
-    public function __construct(RouteCollection $routes, RequestContext $context)
+    public function __construct(UrlGeneratorInterface $urlGenerator)
     {
-        $this->routes = $routes;
-        $this->context = $context;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument) :iterable
@@ -46,8 +42,7 @@ class UiResolver implements ValueResolverInterface
             return [];
         }
 
-        $urlGenerator = new UrlGenerator($this->routes, $this->context);
-        $ui = new Ui($request, $urlGenerator);
+        $ui = new Ui($request, $this->urlGenerator);
 
         return [$ui];
     }
