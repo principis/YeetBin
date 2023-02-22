@@ -53,6 +53,7 @@ class AuthenticationManager
     private function getAuthenticator() :?string
     {
         return match ($this->name) {
+            'basic' => BasicAuthenticator::class,
             default => null
         };
     }
