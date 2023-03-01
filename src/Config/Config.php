@@ -52,7 +52,7 @@ class Config
 
     public function getMaxUploadFileSize() :int
     {
-        return $this->get('max_upload_file_size') ?? 1024 * 1024;
+        return $this->get('max_upload_filesize') ?? 1024 * 1024;
     }
 
     public function get(string $key) :mixed
