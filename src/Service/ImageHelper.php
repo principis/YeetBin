@@ -58,10 +58,7 @@ class ImageHelper
         $imagick->autoOrient();
 
         if ($strip) {
-            // Save orientation to reapply later
-            $orientation = $imagick->getImageOrientation();
             $imagick->stripImage();
-            $imagick->setImageOrientation($orientation);
         }
         if ($resize) {
             $this->resizeImage($imagick);
