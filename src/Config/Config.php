@@ -26,14 +26,15 @@ use Symfony\Component\Routing\RouteCollection;
 class Config
 {
     private static ?Config $instance = null;
-    private array $config;
+    private ConfigLoaderInterface $loader;
 
     protected function __construct()
     {
-        // TODO: handle error
-        $config = require dirname(__DIR__, 2).'/config/config.php';
-
-        $this->config = $config;
+        if (PhpConfigLoader::available()) {
+            $this->loader = new PhpConfigLoader();
+        } else {
+            $this->loader = new EnvConfigLoader();
+        }
     }
 
     public static function getInstance() :Config
@@ -55,18 +56,14 @@ class Config
         return $this->get('max_upload_filesize') ?? 1024 * 1024;
     }
 
-    public function get(string $key) :mixed
+    public function get(string $key) :string|array|null
     {
-        if (!isset($this->config[$key])) {
-            return null;
-        }
-
-        return $this->config[$key];
+        return $this->loader->get($key);
     }
 
     public function isDebug() :bool
     {
-        return isset($this->config['APP_ENV']) && $this->config['APP_ENV'] === 'DEBUG';
+        return $this->get('APP_ENV') === 'DEBUG';
     }
 
     public static function loadRoutes() :RouteCollection
