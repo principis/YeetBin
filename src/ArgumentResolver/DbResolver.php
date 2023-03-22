@@ -46,9 +46,9 @@ class DbResolver implements ValueResolverInterface
         return [
             new Database(
                 $this->config['dsn'],
-                $this->config['username'],
-                $this->config['password'],
-                $this->config['options'],
+                $this->config['username'] ?? null,
+                $this->config['password'] ?? null,
+                $this->config['options'] ?? null,
             ),
         ];
     }
