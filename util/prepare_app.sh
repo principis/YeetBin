@@ -6,11 +6,18 @@ echo 'Checking if uploads directory exists...'
 UPLOAD_PATH="${ROOT}/var/uploads"
 if [ ! -d "$UPLOAD_PATH" ]; then
   echo 'Creating uploads directory...'
-  mkdir -p 0775 "$UPLOAD_PATH"
+  mkdir -p "$UPLOAD_PATH"
+fi
+
+echo 'Checking if cache directory exists...'
+CACHE_PATH="${ROOT}/var/cache"
+if [ ! -d "$CACHE_PATH" ]; then
+  echo 'Creating cache directory...'
+  mkdir -p "$CACHE_PATH"
 fi
 
 echo 'Setting permissions...'
-chmod 0775 "${ROOT}/var" "${ROOT}/var/uploads"
+chmod 0775 "${ROOT}/var" "${ROOT}/var/uploads" "${ROOT}/var/cache"
 
 echo 'Checking if database exists...'
 DB_PATH="${ROOT}/var/sqlite.db"
