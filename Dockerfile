@@ -1,3 +1,4 @@
+ARG PHP_EXTENSIONS="apcu imagick pdo_sqlite sqlite3"
 FROM thecodingmachine/php:8.1-v4-cli-node18 as BUILD_IMAGE
 
 WORKDIR /usr/src/app
@@ -26,9 +27,10 @@ USER docker
 ENV APACHE_DOCUMENT_ROOT=public/
 
 ENV APP_ENV='prod'\
-    DATABASE_DSN='sqlite:/app/var/sqlite.db'
+    DATABASE_DSN='sqlite:/var/www/html/var/sqlite.db'
 
 COPY --from=BUILD_IMAGE /usr/src/app ./
+COPY --from=BUILD_IMAGE /usr/src/app/util/.htaccess ./public/
 COPY --from=BUILD_IMAGE /usr/src/app/util/prepare_app.sh /etc/container/startup.sh
 
 VOLUME /var/www/html/var
