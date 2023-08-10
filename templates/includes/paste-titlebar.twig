@@ -24,7 +24,7 @@
     </div>
     {% if is_text %}
         <div class="ps-2 ms-2 border-start small">
-            {{ paste_lines }} lines
+            {{ paste_lines }} {{ 'line' ~ (paste_lines != 1 ? 's')  }}
         </div>
     {% endif %}
     <div class="ps-2 ms-2 border-start small">
