@@ -25,6 +25,7 @@ use App\Security\Authentication\AuthenticationManager;
 use App\Security\Firewall;
 use App\Ui\Extension\AuthenticationExtension;
 use App\Ui\Extension\FirewallExtension;
+use App\Ui\Extension\FormatExtension;
 use Symfony\Bridge\Twig\Extension\AssetExtension;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Component\Asset\Packages;
@@ -63,6 +64,7 @@ class Ui
         $this->twig->addExtension(new RoutingExtension($urlGenerator));
         $this->twig->addExtension(new AuthenticationExtension($authManager));
         $this->twig->addExtension(new FirewallExtension($firewall));
+        $this->twig->addExtension(new FormatExtension());
 
         if (Config::getInstance()->isDebug()) {
             $this->twig->addExtension(new DebugExtension());
