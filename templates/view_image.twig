@@ -21,7 +21,7 @@
 {% set paste_icon = 'code-square' %}
 
 {% block paste_view %}
-    <div class="overflow-auto">
+    <div class="mx-auto">
         <img src="{{ path('raw', {id: paste.id}) }}" class="img-fluid" alt="{{ paste.formattedTitle }}">
     </div>
 {% endblock %}
