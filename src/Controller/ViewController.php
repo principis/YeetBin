@@ -89,12 +89,6 @@ class ViewController
         $ui->addArg('paste', $paste);
 
         $ui->addArg('paste_bytes', $paste->getFile()->getSize());
-        $content = $paste->getContent();
-
-        if ($content !== null) {
-            $ui->addArg('content', $content);
-            $ui->addArg('paste_lines', substr_count($content, "\n") + (empty($content) ? 0 : 1));
-        }
 
         return new Response($ui->render());
     }
@@ -104,7 +98,7 @@ class ViewController
         $paste = self::getPaste($db, $id);
 
         if ($paste instanceof ImagePaste) {
-            return $this->downloadImage($paste, ResponseHeaderBag::DISPOSITION_INLINE);
+            return $this->downloadFile($paste, ResponseHeaderBag::DISPOSITION_INLINE);
         }
 
         $content = $paste->getContent();
@@ -121,8 +115,7 @@ class ViewController
 
         return match (get_class($paste)) {
             TextPaste::class => $this->downloadText($paste),
-            FilePaste::class => $this->downloadFile($paste),
-            ImagePaste::class => $this->downloadImage($paste),
+            FilePaste::class, ImagePaste::class => $this->downloadFile($paste),
         };
     }
 
@@ -139,22 +132,9 @@ class ViewController
         return $response;
     }
 
-    public function downloadFile(FilePaste $paste) :BinaryFileResponse
+    public function downloadFile(FilePaste $paste, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT) :BinaryFileResponse
     {
         $response = new BinaryFileResponse($paste->getFile());
-        $response->headers->set('Content-Type', $paste->getMimeType());
-        $response->setContentDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $paste->getName()
-        );
-
-        return $response;
-    }
-
-    public function downloadImage(ImagePaste $paste, string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT) :BinaryFileResponse
-    {
-        $response = new BinaryFileResponse($paste->getFile());
-        $response->headers->set('Content-Type', $paste->getMimeType());
         $response->setContentDisposition(
             $disposition,
             $paste->getFormattedTitle()

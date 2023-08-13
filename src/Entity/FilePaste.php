@@ -58,7 +58,7 @@ class FilePaste extends Paste
         return null;
     }
 
-    public function getOriginalExtension() :?string
+    public function getOriginalExtension() :string
     {
         return $this->originalExtension;
     }

@@ -22,15 +22,13 @@ namespace App\Entity;
 
 use App\Util\ImageFormat;
 
-class ImagePaste extends Paste
+class ImagePaste extends FilePaste
 {
-    use FileTrait;
-
     private readonly ImageFormat $format;
 
     public function __construct(?string $id, ?string $title, ImageFormat $type)
     {
-        parent::__construct($id, $title);
+        parent::__construct($id, $title, '', '');
 
         $this->format = $type;
     }
