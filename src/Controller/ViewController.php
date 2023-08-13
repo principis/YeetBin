@@ -122,7 +122,7 @@ class ViewController
     public function downloadText(TextPaste $paste) :Response
     {
         $filename = $paste->getFormattedTitle();
-        $filecontent = $paste->getContent() ?? '';
+        $filecontent = $paste->getContent();
 
         $response = new Response($filecontent);
         $disposition = $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename);
