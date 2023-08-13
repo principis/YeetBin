@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FilePaste extends Paste
 {
-
     use FileTrait;
 
     private readonly string $originalName;
@@ -77,6 +76,6 @@ class FilePaste extends Paste
     {
         return $this->getTitle() === null
             ? $this->originalName
-            : $this->getTitle().(empty($this->originalExtension) ? '' : ".{$this->originalExtension}");
+            : $this->getTitle().(empty($this->originalExtension) ?: ".{$this->originalExtension}");
     }
 }
