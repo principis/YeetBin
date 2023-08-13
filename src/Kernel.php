@@ -97,6 +97,7 @@ class Kernel
         );
 
         $response = $kernel->handle($this->request);
+        $response->prepare($this->request);
         $response->send();
     }
 
