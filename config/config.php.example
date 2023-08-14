@@ -1,14 +1,14 @@
 <?php
 
 return [
-    'APP_ENV' => 'DEBUG',
+    'APP_ENV' => 'PROD',
     'database' => [
         'dsn' => 'sqlite:'.__DIR__.'/pastes.db',
         'username' => null,
         'password' => null,
         'options' => null,
     ],
-    'max_upload_filesize' => 1024*1024,
+    'max_upload_filesize' => 1024*1024, // in bytes
     'firewall' => [
         'routes' => ['add_file', 'add_image'],
     ],
